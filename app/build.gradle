@@ -51,10 +51,11 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 
-    // Couchbase Lite (newer version)
+    // Couchbase Lite
     implementation 'com.couchbase.lite:couchbase-lite-android:3.1.6'
 
-    // RxJava3 (new version, compatible with Kotlin 2.x)
-    implementation 'io.reactivex.rxjava3:rxjava:3.1.8'
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+    // ✅ RxJava2 (to match existing code)
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 }
+
