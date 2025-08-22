@@ -16,6 +16,11 @@ class GestureManagerActivity : FragmentActivity() {
 
     private var displayedId: String? = null
 
+    // Data class for spinner entries
+    data class GestureEntry(val id: String, val appName: String, val gesture: String) {
+        override fun toString(): String = appName
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGestureManagerBinding.inflate(layoutInflater)
@@ -42,19 +47,12 @@ class GestureManagerActivity : FragmentActivity() {
         hideNoGestureMessage()
 
         val entries = savedAppEntries.map {
-            object {
-                val id = it.id
-                val appName = it.appName
-                val gesture = it.gesture
-
-                override fun toString(): String {
-                    return appName
-                }
-            }
+            GestureEntry(it.id, it.appName, it.gesture)
         }
 
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, entries)
         binding.savedAppEntries.adapter = adapter
+
         binding.savedAppEntries.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 Toast.makeText(applicationContext, "Please select something!", Toast.LENGTH_SHORT).show()
@@ -67,11 +65,10 @@ class GestureManagerActivity : FragmentActivity() {
                 id: Long
             ) {
                 val selected = entries[position]
-                val fragment = supportFragmentManager.findFragmentById(R.id.gestureViewerFragment) as GestureViewerFragment
-                fragment.display(
-                    selected.appName,
-                    selected.gesture
-                )
+                val fragment = supportFragmentManager.findFragmentById(R.id.gestureViewerFragment)
+                if (fragment is GestureViewerFragment) {
+                    fragment.display(selected.appName, selected.gesture)
+                }
                 displayedId = selected.id
             }
         }
@@ -85,18 +82,18 @@ class GestureManagerActivity : FragmentActivity() {
     private fun displayNoGesturesMessage() {
         binding.savedAppEntries.visibility = View.GONE
         binding.deleteLaunchEntryButton.visibility = View.GONE
-        supportFragmentManager.beginTransaction()
-            .hide(supportFragmentManager.findFragmentById(R.id.gestureViewerFragment)!!)
-            .commit()
+        supportFragmentManager.findFragmentById(R.id.gestureViewerFragment)?.let { fragment ->
+            supportFragmentManager.beginTransaction().hide(fragment).commit()
+        }
         binding.txtNoGestures.visibility = View.VISIBLE
     }
 
     private fun hideNoGestureMessage() {
         binding.savedAppEntries.visibility = View.VISIBLE
         binding.deleteLaunchEntryButton.visibility = View.VISIBLE
-        supportFragmentManager.beginTransaction()
-            .show(supportFragmentManager.findFragmentById(R.id.gestureViewerFragment)!!)
-            .commit()
+        supportFragmentManager.findFragmentById(R.id.gestureViewerFragment)?.let { fragment ->
+            supportFragmentManager.beginTransaction().show(fragment).commit()
+        }
         binding.txtNoGestures.visibility = View.GONE
     }
 
